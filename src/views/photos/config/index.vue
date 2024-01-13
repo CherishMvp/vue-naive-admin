@@ -9,6 +9,33 @@
 <template>
   <CommonPage show-footer>
     <!-- <n-button type="primary" @click="openModal1">打开第一个弹个窗</n-button> -->
+        <MeCrud
+      ref="$table"
+      v-model:query-items="queryItems"
+      :scroll-x="1200"
+      :columns="columns"
+      :get-data="api.read"
+    >
+      <MeQueryItem label="角色名" :label-width="50">
+        <n-input
+          v-model:value="queryItems.name"
+          type="text"
+          placeholder="请输入角色名"
+          clearable
+          @keydown.enter="() => $table?.handleSearch()"
+        />
+      </MeQueryItem>
+      <MeQueryItem label="状态" :label-width="50">
+        <n-select
+          v-model:value="queryItems.enable"
+          clearable
+          :options="[
+            { label: '启用', value: 1 },
+            { label: '停用', value: 0 },
+          ]"
+        />
+      </MeQueryItem>
+    </MeCrud>
     <MeModal rounded-12 ref="$modal1">
       <n-form ref="formRef" :model="modelRef" :rules="rules">
         <n-form-item path="title" label="导航标题">
@@ -55,6 +82,11 @@ import { sleep } from '@/utils'
 import { useModal } from '@/composables'
 import { ref, h, reactive } from 'vue'
 import { NTag, NButton, useMessage } from 'naive-ui'
+
+const $table = ref(null)
+/** QueryBar筛选参数（可选） */
+const queryItems = ref({})
+
 
 const showModal = ref(false)
 function cancelCallback() {
