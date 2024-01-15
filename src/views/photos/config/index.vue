@@ -9,7 +9,7 @@
 <template>
   <CommonPage show-footer>
     <!-- <n-button type="primary" @click="openModal1">打开第一个弹个窗</n-button> -->
-        <MeCrud
+        <!-- <MeCrud
       ref="$table"
       v-model:query-items="queryItems"
       :scroll-x="1200"
@@ -35,7 +35,7 @@
           ]"
         />
       </MeQueryItem>
-    </MeCrud>
+    </MeCrud> -->
     <MeModal rounded-12 ref="$modal1">
       <n-form ref="formRef" :model="modelRef" :rules="rules">
         <n-form-item path="title" label="导航标题">
