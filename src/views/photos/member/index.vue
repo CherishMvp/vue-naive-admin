@@ -8,12 +8,18 @@
 
 <template>
   <CommonPage show-footer>
+    <template #action>
+      <n-button type="primary" @click="handleAdd()">
+        <i class="mr-4 i-material-symbols:add text-18" />
+        新增成员
+      </n-button>
+    </template>
     <MeCrud
       ref="$table"
       v-model:query-items="queryItems"
       :scroll-x="1200"
       :columns="columns"
-      :get-data="apiClassPhoto.readDorm"
+      :get-data="apiClassPhoto.readMember"
     >
       <MeQueryItem label="寝室号" :label-width="80">
         <n-input
@@ -24,43 +30,39 @@
           @keydown.enter="() => $table?.handleSearch()"
         />
       </MeQueryItem>
-      <MeQueryItem label="导航标题" :label-width="80">
+      <MeQueryItem label="成员姓名" :label-width="80">
         <n-input
-          v-model:value="queryItems.title"
+          v-model:value="queryItems.name"
           type="text"
-          placeholder="请输入导航标题"
+          placeholder="请输入成员姓名"
           clearable
           @keydown.enter="() => $table?.handleSearch()"
         />
       </MeQueryItem>
-      <!-- <MeQueryItem label="状态" :label-width="50">
-        <n-select
-          v-model:value="queryItems.enable"
-          clearable
-          :options="[
-            { label: '启用', value: 1 },
-            { label: '停用', value: 0 },
-          ]"
-        />
-      </MeQueryItem> -->
     </MeCrud>
     <MeModal rounded-12 ref="modalRef">
       <n-form
         ref="modalFormRef"
         :model="modalForm"
-        :rules="rules"
         label-placement="left"
         label-align="left"
-        :label-width="120"
+        :rules="rules"
+        :label-width="100"
       >
-        <n-form-item path="title" label="导航标题">
-          <n-input round v-model:value="modalForm.title" />
-        </n-form-item>
-        <n-form-item path="desc" label="宣传标语">
-          <n-input round v-model:value="modalForm.desc" type="text" />
+        <n-form-item path="name" label="成员姓名">
+          <n-input round v-model:value="modalForm.name" />
         </n-form-item>
         <n-form-item path="dormitoryId" label="寝室号">
-          <!-- <n-input round  v-model:value="modalForm.dormitoryId" type="text" /> -->
+          <!-- <n-select
+            clearable
+            v-model:value="modalForm.dormitoryId"
+            :loading="loading"
+            remote
+            filterable
+            placeholder="搜索寝室ID"
+            @search="handleOptionsSearch"
+            :options="options"
+          ></n-select> -->
           <n-select
             rounded-12
             clearable
@@ -70,12 +72,11 @@
             :options="options"
           ></n-select>
         </n-form-item>
-        <n-form-item path="swiper_list" label="轮播图URL地址">
+        <n-form-item path="imageUrl" label="图片地址">
           <n-input
             rounded-12
-            round
             type="textarea"
-            v-model:value="modalForm.swiper_list"
+            v-model:value="modalForm.imageUrl"
             placeholder="输入URL，一行一个"
           />
         </n-form-item>
@@ -95,7 +96,9 @@ import { NTag, NButton, useMessage } from 'naive-ui'
 import { apiClassPhoto } from '../api'
 import { useCrud, useOptionsSearch } from '@/composables'
 
+const { options, loading } = useOptionsSearch()
 const $table = ref(null)
+
 /** QueryBar筛选参数（可选） */
 const queryItems = ref({})
 
@@ -103,13 +106,59 @@ function submitCallback() {
   $message.success('Submit')
 }
 
+const text = ref('')
+
+const handleOptionsSearch = async () => {
+  loading.value = true
+  const res = await apiClassPhoto.getAllRoomIds()
+  console.log('res', res)
+  options.value = res.data.map((item) => {
+    return { label: item.dormitoryId + '-' + item.title, value: item.dormitoryId }
+  })
+  console.log('options', options.value)
+  loading.value = false
+}
+
+onMounted(() => {
+  console.log('读取相册列表内容')
+  // getAllPhotoList()
+  // init()
+  $table.value?.handleSearch()
+  // 获取筛选内容
+  handleOptionsSearch()
+})
+
+// 解构增删改操作
+const { modalRef, modalFormRef, modalAction, modalForm, handleAdd, handleDelete, handleEdit } =
+  useCrud({
+    name: '寝室成员',
+    doCreate: apiClassPhoto.createMember,
+    doDelete: apiClassPhoto.deleteMember,
+    doUpdate: apiClassPhoto.updateMember,
+    initForm: { enable: true },
+    refresh: () => $table.value?.handleSearch(),
+  })
+
+const paginationReactive = reactive({
+  page: 2,
+  pageSize: 5,
+  showSizePicker: true,
+  pageSizes: [3, 5, 7],
+  onChange: (page) => {
+    paginationReactive.page = page
+  },
+  onUpdatePageSize: (pageSize) => {
+    paginationReactive.pageSize = pageSize
+    paginationReactive.page = 1
+  },
+})
 const rules = {
-  title: [
+  name: [
     {
       required: true,
       validator(rule, value) {
         if (!value) {
-          return new Error('需要标题')
+          return new Error('需要成员姓名')
         } else if (value.length > 50) {
           return new Error('不能超过50个字符')
         }
@@ -118,28 +167,20 @@ const rules = {
       trigger: ['input', 'blur'],
     },
   ],
-  desc: [
-    {
-      required: true,
-      message: '请输入描述',
-      trigger: ['input', 'blur'],
-    },
-  ],
   dormitoryId: [
     {
       required: true,
-      message: '请输入寝室ID',
+      message: '寝室号',
     },
   ],
-  swiper_list: [
+  imageUrl: [
     {
       required: true,
-      message: '请输入url链接，英文逗号隔开',
+      message: '请输入图片链接',
+      trigger: ['input', 'blur'],
     },
   ],
 }
-
-const text = ref('')
 const columns = [
   {
     title: '序号',
@@ -150,16 +191,11 @@ const columns = [
     },
   },
   {
-    title: '导航标题',
-    key: 'title',
+    title: '成员姓名',
+    key: 'name',
     align: 'center',
   },
 
-  {
-    title: '文本内容描述',
-    key: 'desc',
-    align: 'center',
-  },
   {
     title: '寝室号',
     key: 'dormitoryId',
@@ -171,7 +207,8 @@ const columns = [
           style: {
             marginRight: '6px',
           },
-          type: 'info',
+          type: 'success',
+          shape: 'round',
           bordered: false,
         },
         {
@@ -182,12 +219,9 @@ const columns = [
   },
   {
     title: '轮播图url',
-    key: 'swiper_list',
+    key: 'imageUrl',
     align: 'center',
     width: 420,
-    render(row) {
-      return row.swiper_list.join(',')
-    },
   },
   {
     title: '操作栏',
@@ -231,36 +265,4 @@ const columns = [
     },
   },
 ]
-onMounted(() => {
-  console.log('读取相册列表内容')
-  // getAllPhotoList()
-  // init()
-  $table.value?.handleSearch()
-})
-const { options, loading } = useOptionsSearch()
-
-// 解构增删改操作
-const { modalRef, modalFormRef, modalAction, modalForm, handleAdd, handleDelete, handleEdit } =
-  useCrud({
-    name: '寝室',
-    doCreate: apiClassPhoto.createRoom,
-    doDelete: apiClassPhoto.deleteRoom,
-    doUpdate: apiClassPhoto.updateRoom,
-    initForm: { enable: true },
-    refresh: () => $table.value?.handleSearch(),
-  })
-
-const paginationReactive = reactive({
-  page: 2,
-  pageSize: 5,
-  showSizePicker: true,
-  pageSizes: [3, 5, 7],
-  onChange: (page) => {
-    paginationReactive.page = page
-  },
-  onUpdatePageSize: (pageSize) => {
-    paginationReactive.pageSize = pageSize
-    paginationReactive.page = 1
-  },
-})
 </script>

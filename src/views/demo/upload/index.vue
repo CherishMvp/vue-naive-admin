@@ -58,10 +58,10 @@ defineOptions({ name: 'ImgUpload' })
 const { copy, copied } = useClipboard()
 
 const imgList = reactive([
-  { url: 'https://cdn.isme.top/images/5c23d52f880511ebb6edd017c2d2eca2.jpg' },
-  { url: 'https://cdn.isme.top/images/5c23d52f880511ebb6edd017c2d2eca2.jpg' },
-  { url: 'https://cdn.isme.top/images/5c23d52f880511ebb6edd017c2d2eca2.jpg' },
-  { url: 'https://cdn.isme.top/images/5c23d52f880511ebb6edd017c2d2eca2.jpg' },
+  { url: 'https://miniprogram.fancyzh.top/foods/dumplings-8.jpg' },
+  { url: 'https://miniprogram.fancyzh.top/foods/dumplings-8.jpg' },
+  { url: 'https://miniprogram.fancyzh.top/foods/dumplings-8.jpg' },
+  { url: 'https://miniprogram.fancyzh.top/foods/dumplings-8.jpg' },
 ])
 
 watch(copied, (val) => {
@@ -87,6 +87,7 @@ async function handleUpload({ file, onFinish }) {
     $message.success('上传成功')
     imgList.push({ fileName: file.name, url: URL.createObjectURL(file.file) })
     onFinish()
+    console.log('imgList',imgList)
   }, 1500)
 }
 </script>

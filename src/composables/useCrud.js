@@ -84,7 +84,9 @@ export const useCrud = ({ name, initForm = {}, doCreate, doDelete, doUpdate, ref
   }
 
   /** 删除 */
-  function handleDelete(id, confirmOptions) {
+  function handleDelete(id, confirmOptions)
+  {
+    console.log('id, confirmOptions', id, confirmOptions)
     if (!id && id !== 0) return
     const d = $dialog.warning({
       content: '确定删除？',

@@ -10,7 +10,7 @@
   <CommonPage>
     <template #action>
       <n-button type="primary" @click="handleAdd()">
-        <i class="i-material-symbols:add mr-4 text-18" />
+        <i class="mr-4 i-material-symbols:add text-18" />
         新增角色
       </n-button>
     </template>
@@ -78,7 +78,7 @@
             :tree-data="permissionTree"
             label-field="name"
             key-field="id"
-            class="cus-scroll max-h-200 w-full"
+            class="w-full cus-scroll max-h-200"
           />
         </n-form-item>
         <n-form-item label="状态" path="enable">
@@ -167,7 +167,7 @@ const columns = [
           },
           {
             default: () => '编辑',
-            icon: () => h('i', { class: 'i-material-symbols:edit-outline text-14' }),
+            icon: () => h('i', { class: 'i-fe:edit text-14' }),
           }
         ),
 
@@ -182,7 +182,7 @@ const columns = [
           },
           {
             default: () => '删除',
-            icon: () => h('i', { class: 'i-material-symbols:delete-outline text-14' }),
+            icon: () => h('i', { class: 'i-fe:trash text-14' }),
           }
         ),
       ]
@@ -201,7 +201,7 @@ async function handleEnable(row) {
     row.enableLoading = false
   }
 }
-
+// 解构增删改操作
 const { modalRef, modalFormRef, modalAction, modalForm, handleAdd, handleDelete, handleEdit } =
   useCrud({
     name: '角色',

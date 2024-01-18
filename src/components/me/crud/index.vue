@@ -11,18 +11,18 @@
     v-if="$slots.default"
     bordered
     bg="#fafafc dark:black"
-    class="mb-30 min-h-60 flex justify-between rounded-4 p-16"
+    class="flex justify-between p-16 mb-30 min-h-60 rounded-4"
   >
     <n-space wrap :size="[32, 16]">
       <slot />
     </n-space>
     <div class="flex-shrink-0">
       <n-button ghost type="primary" @click="handleReset">
-        <i class="i-fe:rotate-ccw mr-4" />
+        <i class="mr-4 i-fe:rotate-ccw" />
         重置
       </n-button>
       <n-button class="ml-20" type="primary" @click="handleSearch">
-        <i class="i-fe:search mr-4" />
+        <i class="mr-4 i-fe:search" />
         搜索
       </n-button>
     </div>
@@ -45,6 +45,7 @@
 import { NDataTable } from 'naive-ui'
 import { utils, writeFile } from 'xlsx'
 
+// 接受传来的参数，包括分页数据、列名和搜索组件的搜索参数等
 const props = defineProps({
   /**
    * @remote true: 后端分页  false： 前端分页
@@ -100,19 +101,30 @@ const initQuery = { ...props.queryItems }
 const tableData = ref([])
 const pagination = reactive({ page: 1, pageSize: 10 })
 
+// 处理搜索具体逻辑
 async function handleQuery() {
   try {
     loading.value = true
     let paginationParams = {}
-    // 如果非分页模式或者使用前端分页,则无需传分页参数
+    // 如果非分页模式或者使用前端分页,则无需传分页参数isPagination=>是否分页 remote=>true表示后端分页
     if (props.isPagination && props.remote) {
       paginationParams = { pageNo: pagination.page, pageSize: pagination.pageSize }
     }
-    const { data } = await props.getData({
+    const params = {
       ...props.queryItems,
       ...paginationParams,
+    }
+    for (let key in params) {
+      if (params[key] === '') {
+        delete params[key]
+      }
+    }
+    console.log('params', params)
+    const { data } = await props.getData({
+      ...params,
     })
     tableData.value = data?.pageData || data
+    console.log('tableData.value', tableData.value)
     pagination.itemCount = data.total ?? data.length
   } catch (error) {
     tableData.value = []
@@ -122,31 +134,42 @@ async function handleQuery() {
     loading.value = false
   }
 }
+
+// 搜索方法入口
 function handleSearch() {
+  console.log('搜索参数', props.queryItems)
   pagination.page = 1
   handleQuery()
 }
+
+//重置搜索参数等
 async function handleReset() {
   const queryItems = { ...props.queryItems }
   for (const key in queryItems) {
     queryItems[key] = null
   }
+  // 父组件对这个子组件使用的是v-model方法，所以可以直接使用下面这个emit事件 update:queryItems
   emit('update:queryItems', { ...queryItems, ...initQuery })
   await nextTick()
   pagination.page = 1
-  handleQuery()
+  handleQuery() //重置操作，会出现读取数据表
 }
+
+// 分页操作，手动设置page
 function onPageChange(currentPage) {
+  console.log('currentPage', currentPage)
   pagination.page = currentPage
   if (props.remote) {
     handleQuery()
   }
 }
 function onChecked(rowKeys) {
+  console.log('rowKeys', rowKeys)
   if (props.columns.some((item) => item.type === 'selection')) {
     emit('onChecked', rowKeys)
   }
 }
+// 导出数据表
 function handleExport(columns = props.columns, data = tableData.value) {
   if (!data?.length) return $message.warning('没有数据')
   const columnsData = columns.filter((item) => !!item.title && !item.hideInExcel)
@@ -159,6 +182,7 @@ function handleExport(columns = props.columns, data = tableData.value) {
   writeFile(workBook, '数据报表.xlsx')
 }
 
+// 暴露的方法
 defineExpose({
   handleSearch,
   handleReset,

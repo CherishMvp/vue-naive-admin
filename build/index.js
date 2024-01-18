@@ -13,7 +13,9 @@ import dynamicIcons from '../src/assets/icons/dynamic-icons'
 /**
  * @usage 生成icons, 用于 unocss safelist，以支持页面动态渲染自定义图标
  */
-export function getIcons() {
+export function getIcons()
+{
+  // 分别动态导入图标集
   const feFiles = globSync('src/assets/icons/feather/*.svg', { nodir: true, strict: true })
   const meFiles = globSync('src/assets/icons/isme/*.svg', { nodir: true, strict: true })
   const feIcons = feFiles.map((filePath) => {

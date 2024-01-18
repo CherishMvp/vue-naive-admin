@@ -20,10 +20,10 @@
           </div>
         </div>
 
-        <p class="mt-28 text-14 opacity-60">一个人几乎可以在任何他怀有无限热忱的事情上成功。</p>
-        <p class="mt-12 text-right text-12 opacity-40">—— 查尔斯·史考伯</p>
+        <p class="mt-28 text-14 opacity-60">{{ hitokotoInfo.hitokotoText }}</p>
+        <p class="mt-12 text-right text-12 opacity-40">—— 一言</p>
       </n-card>
-      <n-card class="ml-12 w-70%" title="✨ 欢迎使用 Vue Naive Admin 2.0">
+      <n-card class="ml-12 w-70%" :title="'✨ 欢迎使用 ' + projectName">
         <template #header-extra>
           <a
             class="text-14 text-primary text-highlight hover:underline hover:opacity-80"
@@ -36,8 +36,8 @@
         </template>
 
         <p class="opacity-60">
-          这是一款极简风格的后台管理模板，包含前后端解决方案，前端使用 Vite + Vue3 + Pinia +
-          Unocss，后端使用 Nestjs + TypeOrm +
+          这是一款极简风格的班级相册管理后台。管理后台使用 Vite + Vue3 + Pinia +
+          Unocss，小程序使用uniapp + vue3 + vite4 + pinia + unocss， 后端使用 Nestjs + TypeOrm +
           MySql，简单易用，赏心悦目，历经十几次重构和细节打磨，诚意满满！！
         </p>
         <footer class="mt-12 flex items-center justify-end">
@@ -161,7 +161,7 @@ import { BarChart, LineChart, PieChart } from 'echarts/charts'
 import { UniversalTransition } from 'echarts/features'
 import { CanvasRenderer } from 'echarts/renderers'
 import VChart from 'vue-echarts'
-
+import { reactive } from 'vue'
 const userStore = useUserStore()
 
 echarts.use([
@@ -280,4 +280,21 @@ const skillOption = {
 }
 
 const message = $message
+
+const projectName = ref('班级相册管理系统')
+const hitokotoInfo = reactive({
+  hitokotoText: '',
+  href: 'https://hitokoto.cn/?uuid=',
+})
+
+async function fetchHitokoto() {
+  const response = await fetch('https://v1.hitokoto.cn')
+  const { uuid, hitokoto: hitokotoText } = await response.json()
+  hitokotoInfo.href = hitokotoInfo.href + uuid
+  hitokotoInfo.hitokotoText = hitokotoText
+  console.log('hitokotoInfo', hitokotoInfo)
+}
+onMounted(async () => {
+  await fetchHitokoto()
+})
 </script>

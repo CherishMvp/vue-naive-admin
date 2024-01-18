@@ -51,8 +51,8 @@ export default defineConfig(({ command, mode }) => {
     ],
     resolve: {
       alias: {
-        '@': path.resolve(process.cwd(), 'src'),
-        '~': path.resolve(process.cwd()),
+        '@': path.resolve(__dirname, 'src'),
+        '~': path.resolve(__dirname),
       },
     },
     server: {
