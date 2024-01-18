@@ -17,8 +17,8 @@ jobs:
       - name: Build and package
         run: |
           # 执行打包操作，生成 dist 文件夹
-          pnpm install
-          pnpm run build
+          npm install
+          npm run build
           tar czf dist.tar.gz dist
 
       - name: Copy files to server
