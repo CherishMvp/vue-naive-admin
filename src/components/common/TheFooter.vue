@@ -12,12 +12,12 @@
     <p>
       Copyright © 2023
       <a
-        href="https://github.com/zclzone"
+        href="https://github.com/CherishMvp"
         target="__blank"
         class="transition"
         hover="decoration-underline color-primary"
       >
-        Ronnie Zhang(大脸怪)
+        cherish
       </a>
     </p>
   </footer>
