@@ -22,7 +22,6 @@
         </div>
       </n-upload-dragger>
     </n-upload>
-
     <n-card v-if="imgList && imgList.length" class="mt-16 items-center">
       <n-image-group>
         <n-space justify="space-between" align="center">
@@ -53,6 +52,9 @@
 
 <script setup>
 import { useClipboard } from '@vueuse/core'
+import uploadFileToOSS from '@/composables/useUploadOss'
+import { ref } from 'vue'
+
 defineOptions({ name: 'ImgUpload' })
 
 const { copy, copied } = useClipboard()
@@ -68,6 +70,16 @@ watch(copied, (val) => {
   val && $message.success('已复制到剪切板')
 })
 
+const handleFileChange = async ({ file }) => {
+  console.log('eee==filefile', file)
+  if (file) {
+    console.log('file', file)
+    uploadFileToOSS(file).then((imgInfo) => {
+      console.log('imgInfo', imgInfo)
+      imgList.push(imgInfo)
+    })
+  }
+}
 function onBeforeUpload({ file }) {
   if (!file.file?.type.startsWith('image/')) {
     $message.error('只能上传图片')
@@ -77,17 +89,19 @@ function onBeforeUpload({ file }) {
 }
 
 async function handleUpload({ file, onFinish }) {
+  console.log('图片信息', file)
   if (!file || !file.type) {
     $message.error('请选择文件')
   }
-
+  // 真实上传
   // 模拟上传
   $message.loading('上传中...')
-  setTimeout(() => {
+  setTimeout(async () => {
     $message.success('上传成功')
-    imgList.push({ fileName: file.name, url: URL.createObjectURL(file.file) })
+    await handleFileChange(file)
+    // imgList.push({ fileName: file.name, url: URL.createObjectURL(file.file) })
     onFinish()
-    console.log('imgList',imgList)
+    console.log('imgList', imgList)
   }, 1500)
 }
 </script>
