@@ -21,7 +21,7 @@ const uploadFileToOSS = async (file) => {
   let fileNameReturn = ''
   // 获取上传签名
   const getOssData = async () => {
-    const res = await axios.get('https://ai-miniprogram.fancyzh.top/oss/signature')
+    const res = await axios.get('/api/oss/signature')
     console.log('OSS 签名接口数据', res.data)
     return res.data.data
   }
