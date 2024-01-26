@@ -75,12 +75,6 @@ export default defineConfig(({ command, mode }) => {
     },
     build: {
       chunkSizeWarningLimit: 1024, // chunk 大小警告的限制（单位kb）
-      terserOptions: {
-        compress: {
-          drop_console: true,
-          drop_debugger: true,
-        },
-      },
     },
     esbuild: {
       drop: process.env.NODE_ENV !== 'development' ? ['console', 'debugger'] : [],
