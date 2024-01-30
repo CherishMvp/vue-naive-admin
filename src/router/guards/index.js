@@ -6,14 +6,15 @@
  * Copyright © 2023 Ronnie Zhang(大脸怪) | https://isme.top
  **********************************/
 
+import { createPageGAGuard } from './page-ga-guard'
 import { createPageLoadingGuard } from './page-loading-guard'
 import { createPageTitleGuard } from './page-title-guard'
 import { createPermissionGuard } from './permission-guard'
 import { createTabGuard } from './tab-guard'
-
 export function setupRouterGuards(router) {
   createPageLoadingGuard(router)
   createPermissionGuard(router)
   createPageTitleGuard(router)
   createTabGuard(router)
+  createPageGAGuard(router) //谷歌分析内容
 }

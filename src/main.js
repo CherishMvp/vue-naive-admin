@@ -18,13 +18,21 @@ import { setupRouter } from './router'
 import { setupStore } from './store'
 import { setupNaiveDiscreteApi } from './utils'
 import { setupDirectives } from './directives'
-
+import VueGtag from 'vue-gtag'
 async function bootstrap() {
   const app = createApp(App)
   setupStore(app)
   setupNaiveDiscreteApi()
   setupDirectives(app)
   await setupRouter(app)
+  app.use(VueGtag, {
+    config: {
+      id: 'G-8JYVM30T4P',
+      params: {
+        anonymize_ip: true,
+      },
+    },
+  })
   app.mount('#app')
 }
 
