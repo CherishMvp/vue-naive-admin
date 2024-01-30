@@ -26,7 +26,7 @@
 
       <i
         class="i-fe:github mr-16 cursor-pointer"
-        @click="handleLinkClick('https://github.com/CherishMvp/isme-nest-serve')"
+        @click="handleLinkClick('https://github.com/CherishMvp')"
       />
       <i
         v-if="false"
