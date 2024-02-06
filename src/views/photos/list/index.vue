@@ -7,32 +7,28 @@
       </n-button>
     </template>
     <n-flex justify="space-around" :vertical="false" :size="[30, 20]">
-
-      <n-card
-        style="width: 30vw"
-        rounded-8
-        mb-15
-        v-for="(item, _index) in photosList"
-        :key="item.id"
-        :title="dormInfo(item.dormitoryId, item.title)"
-      >
-        <template #header-extra>
-          <h4>{{ item.photo_nums }}条</h4>
-        </template>
-        <h5 mb20>{{ item.desc }}</h5>
-        <n-space vertical>
-          <n-progress
-            type="line"
-            :color="themeVars.successColor"
-            :rail-color="changeColor(themeVars.successColor, { alpha: 0.2 })"
-            :indicator-text-color="themeVars.successColor"
-            :percentage="calculatePercentage(item)"
-            :height="24"
-          />
-        </n-space>
-      </n-card>
-
+      <n-row>
+        <n-col class="flex justify-center" span="12" v-for="(item, _index) in photosList" :key="item.id">
+          <n-card style="width: 30vw" rounded-8 m20 :title="dormInfo(item.dormitoryId, item.title)">
+            <template #header-extra>
+              <h4>{{ item.photo_nums }}条</h4>
+            </template>
+            <h5 mb20>{{ item.desc }}</h5>
+            <n-space vertical>
+              <n-progress
+                type="line"
+                :color="themeVars.successColor"
+                :rail-color="changeColor(themeVars.successColor, { alpha: 0.2 })"
+                :indicator-text-color="themeVars.successColor"
+                :percentage="calculatePercentage(item)"
+                :height="24"
+              />
+            </n-space>
+          </n-card>
+        </n-col>
+      </n-row>
     </n-flex>
+
     <!-- 新增相册modal -->
     <MeModal rounded-12 ref="modalRef" width="520px">
       <n-form
